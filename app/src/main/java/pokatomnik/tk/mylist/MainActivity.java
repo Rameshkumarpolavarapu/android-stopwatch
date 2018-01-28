@@ -10,11 +10,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -23,6 +26,9 @@ public class MainActivity extends AppCompatActivity {
     Boolean isStarted = false;
     Date startDate = null;
     DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss.SSS", Locale.ENGLISH);
+    TextView timeLabel;
+    Timer timer = null;
+    Tick tick = null;
     UndoListener undoListener;
 
     @Override
@@ -31,6 +37,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        timeLabel = findViewById(R.id.textView);
 
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, list);
         ((ListView)findViewById(R.id.listView)).setAdapter(adapter);
@@ -77,13 +85,32 @@ public class MainActivity extends AppCompatActivity {
         pickTimeButton.setEnabled(isStarted);
     }
 
+    private void startTimer() {
+        timer = new Timer();
+        tick = new Tick(startDate, dateFormat, this);
+        timer.schedule(tick, 0, 50L);
+    }
+
+    public void updateTimerLabel(String text) {
+        timeLabel.setText(text);
+    }
+
+    private void stopTimer() {
+        tick.cancel();
+        timer.cancel();
+        tick = null;
+        timer = null;
+    }
+
     public void toggleStart(View view) {
         isStarted = !isStarted;
         if (isStarted) {
             clear(null);
             resetDate();
+            startTimer();
         } else {
-            this.startDate = null;
+            startDate = null;
+            stopTimer();
         }
         updateTimerUI();
     }

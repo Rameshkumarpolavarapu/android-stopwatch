@@ -19,6 +19,18 @@
             android:onClick="onFABOnClick"
             app:popupTheme="@style/AppTheme.PopupOverlay" />
 
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:height="40dp"
+            android:gravity="center"
+            android:background="#fefefe"
+            android:textColor="@color/colorPrimary"
+            android:textSize="22sp"
+            android:text="@string/defaultTime" />
+
     </android.support.design.widget.AppBarLayout>
 
     <include
