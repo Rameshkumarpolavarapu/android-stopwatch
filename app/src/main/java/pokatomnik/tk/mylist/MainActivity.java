@@ -8,6 +8,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -16,6 +17,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -28,22 +30,36 @@ public class MainActivity extends AppCompatActivity {
     DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss.SSS", Locale.ENGLISH);
     TextView timeLabel;
     Timer timer = null;
-    Tick tick = null;
-    UndoListener undoListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        dateFormat.setTimeZone(TimeZone.getDefault());
+
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         timeLabel = findViewById(R.id.textView);
 
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, list);
-        ((ListView)findViewById(R.id.listView)).setAdapter(adapter);
+        adapter = new ArrayAdapter<>(
+                this,
+                R.layout.remove_item_text,
+                R.id.tw,
+                list
+        );
 
-        undoListener = new UndoListener(adapter, list);
+        ListView listView = findViewById(R.id.listView);
+        listView.setAdapter(adapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                list.remove(i);
+                adapter.notifyDataSetChanged();
+            }
+        });
+
         updateTimerUI();
     }
 
@@ -87,8 +103,28 @@ public class MainActivity extends AppCompatActivity {
 
     private void startTimer() {
         timer = new Timer();
-        tick = new Tick(startDate, dateFormat, this);
-        timer.schedule(tick, 0, 50L);
+        final MainActivity self = this;
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if (startDate == null || dateFormat == null) {
+                    return;
+                }
+                final long currentTimestamp = new Date().getTime();
+                final long startTimestamp = startDate.getTime();
+
+                self.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        self.updateTimerLabel(
+                                dateFormat.format(
+                                        new Date(currentTimestamp - startTimestamp)
+                                )
+                        );
+                    }
+                });
+            }
+        }, 0, 50L);
     }
 
     public void updateTimerLabel(String text) {
@@ -96,9 +132,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void stopTimer() {
-        tick.cancel();
         timer.cancel();
-        tick = null;
         timer = null;
     }
 
@@ -123,7 +157,21 @@ public class MainActivity extends AppCompatActivity {
         adapter.add(dateStr);
         Snackbar
                 .make(view, "Added time: " + dateStr, Snackbar.LENGTH_LONG)
-                .setAction("UNDO", undoListener)
+                .setAction("UNDO", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        int lastIndex, size = list.size();
+
+                        if (size == 0) {
+                            return;
+                        }
+
+                        lastIndex = size - 1;
+
+                        list.remove(lastIndex);
+                        adapter.notifyDataSetChanged();
+                    }
+                })
                 .show();
     }
 
