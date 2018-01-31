@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
     ArrayAdapter<String> adapter;
     Boolean isStarted = false;
     Date startDate = null;
-    DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss.SSS", Locale.ENGLISH);
+    DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss.SSS", Locale.UK);
     TextView timeLabel;
     Timer timer = null;
 
@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        dateFormat.setTimeZone(TimeZone.getDefault());
+        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
