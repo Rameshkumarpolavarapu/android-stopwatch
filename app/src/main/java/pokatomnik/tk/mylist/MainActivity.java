@@ -43,22 +43,10 @@ public class MainActivity extends AppCompatActivity {
 
         timeLabel = findViewById(R.id.textView);
 
-        adapter = new ArrayAdapter<>(
-                this,
-                R.layout.remove_item_text,
-                R.id.tw,
-                list
-        );
+        adapter = new RemovableArrayAdapter(this, list);
 
         ListView listView = findViewById(R.id.listView);
         listView.setAdapter(adapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                list.remove(i);
-                adapter.notifyDataSetChanged();
-            }
-        });
 
         updateTimerUI();
     }

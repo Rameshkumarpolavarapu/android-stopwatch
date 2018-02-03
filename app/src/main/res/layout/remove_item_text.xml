@@ -2,7 +2,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    android:clickable="true"
+    android:focusable="true"
+    android:background="?android:attr/selectableItemBackground">
 
     <TextView xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/tw"
@@ -18,12 +21,15 @@
         android:textAppearance="?android:attr/textAppearanceListItemSmall" />
 
     <Button
+        android:id="@+id/remove_item_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:background="@drawable/ic_delete_black_24dp"
         android:scaleX="0.5"
         android:scaleY="0.5"
-        android:padding="16dp" />
+        android:padding="16dp"
+        android:clickable="true"
+        android:focusable="true"/>
 
 </LinearLayout>
